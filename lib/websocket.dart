@@ -1,25 +1,28 @@
 import 'dart:async' show Timer;
 import 'dart:convert' show json;
-import 'dart:io' show HttpServer, HttpRequest, WebSocket, WebSocketTransformer;
+import 'dart:io' show HttpServer, WebSocket, WebSocketTransformer;
 
 Future<void> webSocket() async => HttpServer.bind('0.0.0.0', 8000).then(
       (server) => server.listen(
         (request) => WebSocketTransformer.upgrade(request).then(
           (ws) => ws.listen(
-            (data) => _task(request, ws, data),
-            onError: (err) => print('[!]Error -- ${err.toString()}'),
-            onDone: () => print('[+]Done :)'),
-            cancelOnError: true,
+            (data) => _task(ws, data),
+            onError: _onError,
+            onDone: _onDone,
           ),
-          onError: (err) => print('[!]Error -- ${err.toString()}'),
+          onError: _onError,
         ),
-        onError: (err) => print('[!]Error -- ${err.toString()}'),
+        onError: _onError,
       ),
-      onError: (err) => print('[!]Error -- ${err.toString()}'),
+      onError: _onError,
     );
 
-void _task(HttpRequest request, WebSocket ws, data) {
-  print('${request.connectionInfo?.remoteAddress} - ${json.decode(data)}');
+void _onError(err) => print('[!]Error -- ${err.toString()}');
+
+void _onDone() => print('[+]Done :)');
+
+void _task(WebSocket ws, data) {
+  print('${json.decode(data)}');
   Timer(
     Duration(seconds: 3),
     () => ws.readyState == WebSocket.open
