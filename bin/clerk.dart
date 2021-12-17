@@ -1,3 +1,3 @@
-import 'package:clerk/clerk.dart' as clerk;
+import 'package:clerk/websocket.dart' as clerk;
 
 void main() => clerk.webSocket();
